@@ -8,7 +8,7 @@
     
 * [Linux deployment](best_practise/linux_deployment.md)
     * [CE](best_practise/linux_deployment.md#ce)
-    * [PRO](best_practise/linux_deployment.md#pro)
+    * [PRO](https://manual.seafile.com/deploy_pro/)
     
 * [Windows deployment](windows_deployment.md)
     * [CE](best_practise/windows_deployment.md#ce)

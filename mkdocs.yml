@@ -26,8 +26,8 @@ pages:
 - Update: update/update.md
 - Config-files:
     - Seafile: config-files/seafile/overview.md
-        - ccnet: config_files/seafile/ccnet.md
-        - Seafile: config_files/seafile/seafile.md
+        - ccnet: config-files/seafile/ccnet.md
+        - Seafile: config-files/seafile/seafile.md
     - Fail2ban: config-files/fail2ban.md
     - Firewall nft: config-files/firewall-nft.md
     - Firewall firewalld: config-files/firewall-firewalld.md

@@ -13,7 +13,7 @@ pages:
     - Changelog: general/changelog.md
     - System requirements: general/system-requirements.md
     - About: general/about.md
-- Installation:
+- Installation: installation/overview.md
     - OperatingSystem: installation/operatingsystem.md
     - IP: installation/ip.md
     - DNS: installation/dns.md
@@ -25,15 +25,15 @@ pages:
         - Collabora: installation/office/collabora.md
 - Update: update/update.md
 - Config-files:
-    - Seafile: config-files/seafile/overview.md
-        - Ccnet: config-files/seafile/ccnet.md
-        - Seafile: config-files/seafile/seafile.md
-    - Fail2ban: config-files/fail2ban.md
-    - Firewall nft: config-files/firewall-nft.md
-    - Firewall firewalld: config-files/firewall-firewalld.md
+    - Seafile: config_files/seafile/overview.md
+        - Ccnet: config_files/seafile/ccnet.md
+        - Seafile: config_files/seafile/seafile.md
+    - Fail2ban: config_files/fail2ban.md
+    - Firewall nft: config_files/firewall-nft.md
+    - Firewall firewalld: config_files/firewall-firewalld.md
 - Backup/Restore:
-    - Backup: backup-restore/backup.md
-    - Restore: backup-restore/restore.md
+    - Backup: backup_restore/backup.md
+    - Restore: backup_restore/restore.md
 markdown_extensions:
     - toc:
         permalink: 

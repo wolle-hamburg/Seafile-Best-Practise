@@ -17,20 +17,20 @@ pages:
     - OperatingSystem: installation/operatingsystem.md
     - IP: installation/ip.md
     - DNS: installation/dns.md
-	- Webserver Nginx: installation/webserver-nginx.md
-    - LetsEncrypt: installation/LE.md
-	- Seafile Setup: installation/seafile-setup.md
+    - Webserver Nginx: installation/webserver-nginx.md
+    - Let's Encrypt: installation/LE.md
+    - Seafile Setup: installation/seafile-setup.md
     - Office:
-		- OnlyOffice: installation/office/onlyoffice.md
-		- Collabora: installation/office/collabora.md
+        - OnlyOffice: installation/office/onlyoffice.md
+        - Collabora: installation/office/collabora.md
 - Update: update/update.md
 - Config-files:
     - Seafile: config-files/seafile/overview.md
-		- ccnet: config_files/seafile/ccnet.md
-		- seafile: config_files/seafile/seafile.md
-	- Fail2ban: config-files/fail2ban.md
-	- Firewall nft: config-files/firewall-nft.md
-	- Firewall firewalld: config-files/firewall-firewalld.md
+        - ccnet: config_files/seafile/ccnet.md
+        - seafile: config_files/seafile/seafile.md
+    - Fail2ban: config-files/fail2ban.md
+    - Firewall nft: config-files/firewall-nft.md
+    - Firewall firewalld: config-files/firewall-firewalld.md
 - Backup/Restore:
     - Backup: backup-restore/backup.md
     - Restore: backup-restore/restore.md

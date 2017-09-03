@@ -18,7 +18,7 @@ pages:
     - 'IP': 'installation/ip.md'
     - 'DNS': 'installation/dns.md'
     - 'Webserver Nginx': 'installation/webserver-nginx.md'
-    - 'Let's Encrypt': 'installation/LE.md'
+    - 'Lets Encrypt': 'installation/LE.md'
     - 'Seafile Setup': 'installation/seafile-setup.md'
     - 'Office':
         - 'OnlyOffice': 'installation/office/onlyoffice.md'

@@ -13,7 +13,7 @@ pages:
     - 'Changelog': 'general/changelog.md'
     - 'System requirements': 'general/system-requirements.md'
     - 'About': 'general/about.md'
-- Installation: 'installation/overview.md'
+- Installation:
     - 'OperatingSystem': 'installation/operatingsystem.md'
     - 'IP': 'installation/ip.md'
     - 'DNS': 'installation/dns.md'
@@ -25,7 +25,7 @@ pages:
         - 'Collabora': 'installation/office/collabora.md'
 - Update: 'update/update.md'
 - Config-files:
-    - 'Seafile': 'config_files/seafile/overview.md'
+    - 'Seafile':
         - 'Ccnet': 'config_files/seafile/ccnet.md'
         - 'Seafile': 'config_files/seafile/seafile.md'
         - 'Seahub': 'config_files/seafile/seahub.md'

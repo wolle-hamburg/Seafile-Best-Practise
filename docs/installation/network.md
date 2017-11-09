@@ -79,7 +79,7 @@ iface ens3 inet static
   netmask 255.255.255.0
   gateway 192.168.1.1
   dns-domain local
-  dns nameservers 192.168.1.1
+  dns-nameservers 192.168.1.1
 # This is an autoconfigured IPv6 interface
 iface ens3 inet6 auto
 ```
@@ -95,7 +95,7 @@ Having a root server or a vServer without any IPv4 at all is not really within t
 ## Diagnostic Tools
 Install curl
 ```bash
-apt-get install curl
+root@cloudserver:~# apt-get install curl
 ```
 curl is a tool to transfer data from or to a server. We will use it to diagnose the web server.
 

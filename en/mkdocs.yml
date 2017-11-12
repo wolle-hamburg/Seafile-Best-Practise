@@ -2,17 +2,14 @@ site_name: Seafile Best Practise
 site_url: http://seafile-best-practise.readthedocs.io/
 site_description: Seafile Best Practise documentation with Markdown.
 site_author: DerDanilo, Wolle
+theme: readthedocs
 
 repo_url: https://github.com/DerDanilo/Seafile-Best-Practise
 
 pages:
 - Home: 'index.md'
-- General:
-    - 'Contribution': 'general/contribution.md'
-    - 'System requirements': 'general/system-requirements.md'
-    - 'Updates': 'general/updates.md'
-    - 'Changelog': 'general/changelog.md'
-    - 'About': 'general/about.md'
+- 'System requirements': 'system-requirements.md'
+- 'Changelog/Updates': 'changelog_updates.md'
 - Installation:
     - 'Overview': 'installation/overview.md'
     - 'OperatingSystem': 'installation/operating-system.md'

@@ -8,11 +8,11 @@ repo_url: https://github.com/DerDanilo/Seafile-Best-Practise
 
 pages:
 - Home: 'index.md'
-- 'System requirements': 'system-requirements.md'
 - 'Changelog/Updates': 'changelog_updates.md'
 - Installation:
     - 'Overview': 'installation/overview.md'
-    - 'OperatingSystem': 'installation/operating-system.md'
+    - 'System requirements': 'installation/system-requirements.md'
+    - 'Operating systems': 'installation/operating-system.md'
     - 'Network': 'installation/network.md'
     - 'MariaDB': 'installation/mariadb.md'
     - 'Seafile Setup': 'installation/seafile-setup.md'

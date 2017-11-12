@@ -1,7 +1,8 @@
 [TOC]
 
 ---
-# Operating Systems
+## General information
+
 This manual covers setup on the following system:
 
 * Debian (latest)
@@ -13,8 +14,7 @@ To be written:
 * Raspbian (Raspberry Pi)
 * Docker (Linux, maybe Windows)
 
----
-## PATH (folder) information
+### PATH (folder) information
 
 * In this manual we will put the Seafile installation and configuration in `/opt` and seafile_data in `/srv`
 * `/srv` will contain all data in Seafile server and needs to be at least that data size plus some spare for deleted files (file versions)

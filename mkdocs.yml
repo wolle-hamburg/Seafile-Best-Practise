@@ -9,8 +9,7 @@ repo_url: https://github.com/DerDanilo/Seafile-Best-Practise
 pages:
 - Home: 'index.md'
 - 'Changelog/Updates': 'changelog_updates.md'
-- Installation:
-    - 'Overview': 'installation/overview.md'
+- Installation: 
     - 'System requirements': 'installation/system-requirements.md'
     - 'Operating systems': 'installation/operating-system.md'
     - 'Network': 'installation/network.md'
@@ -23,7 +22,7 @@ pages:
         - 'Overview': 'installation/office/overview.md'
         - 'OnlyOffice': 'installation/office/onlyoffice.md'
         - 'Collabora': 'installation/office/collabora.md'
-- Update: 'update/update.md'
+- Updates: 'updates/updates.md'
 - Config-files:
     - 'Overview': 'config_files/overview.md'
     - 'Seafile':

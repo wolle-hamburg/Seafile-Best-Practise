@@ -2,9 +2,20 @@
 
 ---
 
-## Provide a static IPv4 address
-If you have a root server or vServer or for whatever reason you got a static IPv4 address for your server, just use that address and your are done with this chapter. If you have such a server with IPv6 only, read the **No IPv4 ** at the End of this chapter.
+# Tasks
+* Configure static IP(s)
+* Verify network config
 
+# Server IP already assigned
+If you have a *root server* or *vServer* or for whatever reason you got a static IPv4 address for your server, just use that address and your are done with this chapter. 
+
+---
+
+# Configure static IP(s)
+
+## Debian / Ubuntu / Rasphian
+
+### Static IPv4 address
 After installing the operating system it often gets its IPv4 adress via DHCP. To avoid trouble in the future this address should be static in most cases.
 ```sh
 root@cloudserver:~# ip route
@@ -12,7 +23,7 @@ default via 192.168.1.1 dev ens3
 192.168.1.0/24 dev ens3 proto kernel scope link src 192.168.1.22 
 ```
 
-The `default` line tells us 192.168.1.1 is the default gateway, ens3 is the network device in our case. We need to remember that.
+The `default` line tells us `192.168.1.1` is the default gateway, `ens3` is the network device in our case. We need to remember that.
 ```sh
 root@cloudserver:~# ip addr
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
@@ -29,9 +40,14 @@ root@cloudserver:~# ip addr
        valid_lft forever preferred_lft forever
 ```
 
-The interresting part is the inet line in our network device (ens3). It tells us 192.168.1.22 is the current IPv4 address, /24 is the network mask in CIDR notation, which is 255.255.255.0 as subnet mask (see [https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)) and 192.168.1.255 is the broadcast address.
+The interresting part is the inet line in our network device (`ens3`). It tells us `192.168.1.22` is the current IPv4 address, `/24` is the network 
+mask in CIDR notation, which is `255.255.255.0` as subnet mask (see [https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)) 
+and `192.168.1.255` is the broadcast address.
 
-We need to pick an unused IPv4 address, which is not within the dhcp range. Mostly the dhcp server is in the router. You will find the description there. x.x.x.1 ist the gateway in this case as we have seen. dhcp range starts normaly at x.x.x.20 or above. x.x.x.2 is normally free, but you should be sure about that to prevent annoying network problems. I choose 192.168.1.2 as static IPv4 address.
+We need to pick an unused IPv4 address, which is not within the dhcp range. Mostly the dhcp server is in the router. 
+You will find the description there. `x.x.x.1` ist the gateway in this case as we have seen. Dhcp range starts normaly at 
+`x.x.x.20` or above. `x.x.x.2` is normally free, but you should be sure about that to prevent annoying network problems. 
+I choose `192.168.1.2` as static IPv4 address.
 
 ```sh
 root@cloudserver:~# cat /etc/resolv.conf
@@ -42,7 +58,8 @@ root@cloudserver:~# hostname -f
 cloudserver.local
 ```
 
-We take the dns-server (= nameserver)  from here. In this case the dhcp server put this computer in the domain 'fritz.box' while I put it into the domain 'local'. Pros and cons what to take are not scope of this how-to. I will leave it as it is for now.
+We take the dns-server (= nameserver)  from here. In this case the dhcp server put this computer in the domain `fritz.box` while I put it into the domain `local`. 
+Pros and cons what to take are not scope of this how-to. I will leave it as it is for now.
 
 Now it is better to have a backup of the configuration. We can put it in our home directory:
 ```sh
@@ -68,7 +85,7 @@ iface ens3 inet dhcp
 iface ens3 inet6 auto
 ```
 
-Change the network configuration to your actual values (... means no change in there).
+Change the network configuration to your actual values
 ```
 ...
 
@@ -82,34 +99,16 @@ iface ens3 inet static
   dns-nameservers 192.168.1.1
 # This is an autoconfigured IPv6 interface
 iface ens3 inet6 auto
+...
 ```
 
-Reboot and good luck. Test your network configuration to assure it's working as desired. `ip addr` should show your static IPv4 address, `ip route` still the gateway and so on. If something does not work, you have a file named "interfaces" in the home directory of user root, that is your backup. You can copy it back to `/etc/network/interfaces` and start all over.
+Reboot and good luck. Test your network configuration to assure it's working as desired. `ip addr` should show your static IPv4 address, `ip route`
+ still the gateway and so on. If something does not work, you have a file named "interfaces" in the home directory of user root, that is your backup.
+ You can copy it back to `/etc/network/interfaces` and start all over.
 
-### No IPv4
-Having a root server or a vServer without any IPv4 at all is not really within the scope of this manual. Probably the best way is to get a domain now and point it to your IPv6 address.
+### Static IPv6 address
+If you don't want to use or cannot use [IPv6](https://en.wikipedia.org/wiki/IPv6 "IPv6") you may skip this step and anything related to IPv6 in the following chapters.
 
-### Literature
-[Debian Reference Manual: The network interface with the static IP](https://www.debian.org/doc/manuals/debian-reference/ch05.en.html#_the_network_interface_with_the_static_ip)
-
-## Diagnostic Tools
-Install curl
-```bash
-root@cloudserver:~# apt-get install curl
-```
-curl is a tool to transfer data from or to a server. We will use it to diagnose the web server.
-
-Install nmap
-```bash
-root@cloudserver:~# apt-get install nmap
-```
-nmap is a network exploration tool. We will use it as a port scanner to diagnose running services.
-
-
-## IPv6
-If you don't want to use or cannot use [IPv6](https://en.wikipedia.org/wiki/IPv6 "IPv6") you may skip this chapter and anything related to IPv6 in the following chapters.
-
-### Test for IPv6 being enabled
 ```sh
 root@cloudserver:~# ip -6 addr
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 state UNKNOWN qlen 1
@@ -122,9 +121,66 @@ root@cloudserver:~# ip -6 addr
        valid_lft forever preferred_lft forever
 ```
 
-If you find an inet6 address with scope 'global' and not 'deprecated' and not 'temporary', it's an IPv6 address you may use to access your server.
+If you find an inet6 address with scope `global` and not `deprecated` and not `temporary`, it's an IPv6 address you may use to access your server.
 
-If your server has such a global IPv6 address, you can test it with a web browser on a computer in local LAN having IPv6 enabled as well: `http://[2003:a:452:e300:5054:ff:feae:a412]`. This works because the Nginx 'default' server (which we have still enabled) comes with IPv6 enabled.
+Add the IPv6 block to your network configuration
+```
+...
+# This is an IPv6 interface
+iface ens3 inet6 static
+  address xxxx
+  netmask xxxx
+  gateway xxxx
+  dns-domain local
+  dns-nameservers xxxxx
+...
+```
+
+---
+
+## CentOS
+
+### Static IPv4 address
+*To be written...*
+
+### Static IPv6 address
+*To be written...*
+
+---
+
+## IPv6 only
+Having a root server or a vServer without any IPv4 at all is not really within the scope of this manual. Probably the best way is to get a domain 
+now and point it to your IPv6 address.
+
+---
+
+# Verify network config
+## Install diagnostic tools
+
+* `curl` is a tool to transfer data from or to a server. We will use it to diagnose the web server.
+* `nmap` is a network exploration tool. We will use it as a port scanner to diagnose running services.
+
+Install curl & nmap
+
+**Debian / Ubuntu / Rasphian**
+```bash
+root@cloudserver:~# apt-get install curl nmap
+```
+
+**CentOS**
+```bash
+root@cloudserver:~# yum install curl nmap
+```
+
+---
+
+### IPv4
+*To be written...*
+
+---
+
+### IPv6
+If your server has a global IPv6 address, you can test it with a web browser on a computer in local LAN having IPv6 enabled as well: `http://[2003:a:452:e300:5054:ff:feae:a412]`. This works because the Nginx 'default' server (which we have still enabled) comes with IPv6 enabled.
 
 You can test it with curl as well:
 ```sh
@@ -153,25 +209,8 @@ PORT   STATE SERVICE
 80/tcp open  http
 ```
 
-Note that port 80 is open because of the default server, port 443 is not!
+Note that port 80 is open because of the default server, port 443 is not (for now)!
 
-### Enabling IPv6 for Seafile Server
-
-Add a line behind the 'listen 443' directive in `/etc/nginx/sites-available/seafile` like this:
-```
-...
-server {
-    listen       443 ssl http2;
-    listen       [::]:443 ssl http2;
-    server_name  _;
-...
-```
-
-We will refrain from adding it to port 80 as well because of `server_name  192.168.1.2;`. Of course we could add a second name and... No, not now!
-
-Restart Nginx:
-```sh
-root@cloudserver:~# systemctl restart nginx
 ```
 
 Test it using nmap:
@@ -189,3 +228,9 @@ PORT    STATE SERVICE
 ```
 
 Open a web browser: `https://[2003:a:452:e300:5054:ff:feae:a412]/seafile`. Mind the 'https:' as there is no redirection for now. If you see the Log In page, it works. Do not log in for the moment because in Seafile Server we set our IPv4 address as SERVICE_URL and FILE_SERVER_ROOT. It will mix up things sooner or later if you log in. Just be satisfied with the knowledge it could work if we would continue. But in that case we would break IPv4.
+
+---
+
+# Literature
+* [Debian Reference Manual: The network interface with the static IP](https://www.debian.org/doc/manuals/debian-reference/ch05.en.html#_the_network_interface_with_the_static_ip)
+* [CentOS Reference Manual: Interface Configuration Files](https://www.centos.org/docs/5/html/Deployment_Guide-en-US/s1-networkscripts-interfaces.html)

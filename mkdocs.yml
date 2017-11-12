@@ -18,6 +18,8 @@ pages:
     - 'Memcached': 'installation/memcached.md'
     - 'Webserver Nginx': 'installation/webserver-nginx.md'
     - 'Lets Encrypt': 'installation/le.md'
+    - 'Fail2ban': 'installation/fail2ban.md'
+    - 'Firewall': 'installation/firewall.md'
     - 'Office':
         - 'Overview': 'installation/office/overview.md'
         - 'OnlyOffice': 'installation/office/onlyoffice.md'
@@ -41,6 +43,7 @@ pages:
     - 'Restore':
         - 'Small setups': 'backup_restore/restore-small-setups.md'
         - 'Large setups': 'backup_restore/restore-large-setups.md'
+- Updates: 'updates/updates.md'
 markdown_extensions:
     - toc:
         permalink:

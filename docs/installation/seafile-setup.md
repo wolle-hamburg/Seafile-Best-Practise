@@ -9,59 +9,72 @@
 ---
 
 ## Install Seafile Server
-We will install Seafile Server in `/opt/Seafile/Server`, Seafile data in `/srv/Seafile/seafile_data`.
+We will install Seafile Server in `/opt/seafile`, Seafile data in `/srv/seafile_data`.
 
-### Prerequisites
-Install required packages for Seafile Server:
+### Install required packages
+
+**Debian**
 ```sh
 root@cloudserver:~# apt-get install python-setuptools python-imaging python-ldap python-mysqldb python-memcache python-urllib3
 ```
 
-Create a user and his own group to run the Seafile Server. We choose the name 'seafserver' for the user as well as for his group. `useradd -h` for a short help of the switches.
+**Ubuntu**
 ```sh
-root@cloudserver:~# mkdir /opt/Seafile
-root@cloudserver:~# useradd -U -m -d /opt/Seafile/Server seafserver
+root@cloudserver:~# apt-get install python-setuptools python-imaging python-ldap python-mysqldb python-memcache python-urllib3
+```
+
+**CentOS**
+```sh
+root@cloudserver:~# yum install python-setuptools python-imaging python-ldap python-mysqldb python-memcache python-urllib3
+```
+
+### Create system user
+Create a user and his own group to run the Seafile Server. We choose the name `seafserver` for the user as well as for his group. `useradd -h` for a short help of the switches.
+```sh
+root@cloudserver:~# mkdir /opt/seafile
+root@cloudserver:~# useradd -U -m -d /opt/seafile seafserver
 ```
 
 You can check the result:
 ```sh
-root@cloudserver:~#  ls -l /opt/Seafile/
+root@cloudserver:~#  ls -l /opt/seafile/
 total 4
 drwxr-xr-x 2 seafserver seafserver 4096 Jul  3 17:10 Server
 root@cloudserver:~#  grep seafserver /etc/passwd
-seafserver:x:1001:1001::/opt/Seafile/Server:
+seafserver:x:1001:1001::/opt/seafile:
 root@cloudserver:~#  grep seafserver /etc/group
 seafserver:x:1001:
 ```
 
-Download the lastest Seafile Server package from [here](https://www.seafile.com/en/download "here") and put it in `/opt/Seafile/Server/installed`. Adjust the version number.
+### Download latest stable Seafile Server package
+Download the lastest Seafile Server package from [here](https://www.seafile.com/en/download) and put it in `/opt/Seafile/Server/installed`. Adjust the version number.
 ```sh
-root@cloudserver:~#  mkdir /opt/Seafile/Server/installed
-root@cloudserver:~#  wget -P /opt/Seafile/Server/installed https://download.seadrive.org/seafile-server_6.1.1_x86-64.tar.gz
+root@cloudserver:~#  mkdir /opt/seafile/installed
+root@cloudserver:~#  wget -P /opt/seafile/installed https://download.seadrive.org/seafile-server_6.2.2_x86-64.tar.gz
 ```
 
-Install Seafile Server:
+### Untar the package
 ```sh
-root@cloudserver:~# tar -xz -C /opt/Seafile/Server -f /opt/Seafile/Server/installed/seafile-server_*
+root@cloudserver:~# tar -xz -C /opt/seafile -f /opt/seafile/installed/seafile-server_*
 ```
 
 It should look something like this:
 ```sh
-root@cloudserver:~# ls -l /opt/Seafile/Server
+root@cloudserver:~# ls -l /opt/seafile
 total 8
 drwxr-xr-x 2 root root 4096 Jul  3 17:22 installed
 drwxrwxr-x 6  500  500 4096 Jun 13 07:52 seafile-server-6.1.1
 ```
 
-Configure Seafile Server and databases.
+### Configure Seafile Server and databases.
 ```sh
-root@cloudserver:~# mkdir /srv/Seafile
-root@cloudserver:~# /opt/Seafile/Server/seafile-server-*/setup-seafile-mysql.sh
+root@cloudserver:~# mkdir /srv/seafile-data
+root@cloudserver:~# /opt/seafile/seafile-server-*/setup-seafile-mysql.sh
 ```
 
 - `[ server name ]` Cloud (whatever you like)
 - `[ This server's ip or domain ]` 192.168.1.2 (Server's IP address)
-- `[ default "/opt/Seafile/Server/seafile-data" ]` /srv/Seafile/seafile-data
+- `[ default "/opt/seafile/seafile-data" ]` /srv/seafile-data
 - `[ default "8082" ]` (leave the port as it is)
 - `[ 1 or 2 ]` 1 (create new databases)
 - `[ default "localhost" ]` (database runs on this server)
@@ -73,14 +86,15 @@ root@cloudserver:~# /opt/Seafile/Server/seafile-server-*/setup-seafile-mysql.sh
 - `[ default "seafile-db" ]`
 - `[ default "seahub-db" ]`
 
+### Fix file and folder permission
 Now the user seafserver needs to own the whole stuff:
 ```sh
-root@cloudserver:~# chown -R seafserver:seafserver /opt/Seafile/Server  /srv/Seafile
+root@cloudserver:~# chown -R seafserver:seafserver /opt/seafile  /srv/seafile-data
 ```
 
 It should look like this:
 ```sh
-root@cloudserver:~# ls -l /opt/Seafile/Server
+root@cloudserver:~# ls -l /opt/seafile
 total 20
 drwx------ 2 seafserver seafserver 4096 Jul  3 17:59 ccnet
 drwx------ 2 seafserver seafserver 4096 Jul  3 17:59 conf
@@ -88,11 +102,12 @@ drwxr-xr-x 2 seafserver seafserver 4096 Jul  3 17:22 installed
 drwxrwxr-x 6 seafserver seafserver 4096 Jun 13 07:52 seafile-server-6.1.1
 lrwxrwxrwx 1 seafserver seafserver   20 Jul  3 17:59 seafile-server-latest -> seafile-server-6.1.1
 drwxr-xr-x 3 seafserver seafserver 4096 Jul  3 17:59 seahub-data
-root@cloudserver:~# ls -l /srv/Seafile
+root@cloudserver:~# ls -l /srv
 total 4
 drwx------ 3 seafserver seafserver 4096 Jul  3 17:59 seafile-data
 ```
 
+### First Start of Seafile Server
 Now we can start Seafile Server as user 'seafserver'
 ```sh
 root@cloudserver:~# su -l seafserver
@@ -107,8 +122,8 @@ $ seafile-server-latest/seahub.sh start
 --- 
 
 ## Verification
-Use nmap to check the necessary ports are open. 22 is SSH, only open if you installed SSH server.  3306 is mariadb, only bound to localhost, 
-not accessible from outside via network. 8000 is seahub, the web interface. 8082 is seafile, the data service daemon:
+Use `nmap` to check the necessary ports are open. `22` is `SSH`, only open if you installed `SSH server`. `3306` is `mariadb`, only bound to `localhost`, 
+not accessible from outside via network. `8000` is `seahub`, the `web interface`. `8082` is `seafile`, the `data service daemon`:
 ```sh
 $ nmap localhost
 
@@ -151,8 +166,8 @@ $ exit
 
 There is some data located in the `/opt` directory. We should change this and move the data to `/srv`. A link will give Seafile Server access to its data:
 ```sh
-root@cloudserver:~# mv /opt/Seafile/Server/seahub-data /srv/Seafile/
-root@cloudserver:~# ln -s /opt/Seafile/Server/seahub-data /srv/Seafile/seahub-data
+root@cloudserver:~# mv /opt/seafile/seahub-data /srv/seahub-data/
+root@cloudserver:~# ln -s /opt/seafile/seahub-data /srv/seahub-data
 ```
 
 At least start your Seafile Server again as user 'seafserver' to check it's still working. Stop Seafile Server before proceeding to the next step.
@@ -171,8 +186,8 @@ After=network.target mysql.service
 
 [Service]
 Type=oneshot
-ExecStart=/opt/Seafile/Server/seafile-server-latest/seafile.sh start
-ExecStop=/opt/Seafile/Server/seafile-server-latest/seafile.sh stop
+ExecStart=/opt/seafile/seafile-server-latest/seafile.sh start
+ExecStop=/opt/seafile/seafile-server-latest/seafile.sh stop
 RemainAfterExit=yes
 User=seafserver
 Group=seafserver
@@ -189,8 +204,8 @@ After=network.target seafile.service
 
 [Service]
 # change start to start-fastcgi if you want to run fastcgi
-ExecStart=/opt/Seafile/Server/seafile-server-latest/seahub.sh start
-ExecStop=/opt/Seafile/Server/seafile-server-latest/seahub.sh stop
+ExecStart=/opt/seafile/seafile-server-latest/seahub.sh start
+ExecStop=/opt/seafile/seafile-server-latest/seahub.sh stop
 User=seafserver
 Group=seafserver
 Type=oneshot
@@ -227,4 +242,5 @@ root@cloudserver:~# systemctl enable seahub
 Created symlink /etc/systemd/system/multi-user.target.wants/seahub.service → /etc/systemd/system/seahub.service.
 ```
 
-To verify the automatic startup you need to reboot your server and afterwards Seafile Server should be running.
+To verify the automatic startup you need to reboot your server and afterwards Seafile Server should be running.  
+But you can do a reboot later. Continue with the next step.

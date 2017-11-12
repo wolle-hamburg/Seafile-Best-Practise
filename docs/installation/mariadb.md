@@ -1,6 +1,10 @@
 [TOC]
 
 ---
+
+# What is MariaDB?
+Please check the [Wikipedia page](https://en.wikipedia.org/wiki/MariaDB).
+
 # Tasks
 * Install MariaDB
 * Enable MariaDB autostart

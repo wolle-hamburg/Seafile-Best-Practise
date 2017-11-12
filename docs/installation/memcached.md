@@ -2,6 +2,9 @@
 
 ---
 
+# What is memcached?
+Please check the [Wikipedia page](https://en.wikipedia.org/wiki/Memcached).
+
 # Tasks
 * Install Memcached
 * Enable Memcached autostart

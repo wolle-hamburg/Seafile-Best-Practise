@@ -2,9 +2,21 @@
 
 ---
 
-## Seafile Server with Nginx
-Nginx is a web server, which we will use as a reverse proxy. In this mode incoming requests can distributed to several services, in our case to the seafile and seahub services. Furthermore Nginx can secure the connection to the browsers or clients providing encryption through TLS protocol a.s.o.
-### Install Nginx
+# What is the Nginx web server?
+Nginx is a web server, which we will use as a reverse proxy. In this mode incoming requests can distributed to several services, 
+in our case to the seafile and seahub services. Furthermore Nginx can secure the connection to the browsers or clients providing 
+encryption through TLS protocol a.s.o.
+
+Please check the [Wikipedia page](https://en.wikipedia.org/wiki/nginx) for further information.
+
+# Tasks
+* Install Nginx
+* Enable Nginx autostart
+* Configure Nginx
+
+---
+
+## Install Nginx
 ```sh
 root@cloudserver:~# apt-get install nginx
 ```
@@ -12,11 +24,17 @@ root@cloudserver:~# apt-get install nginx
 Verify it is running. Open a web browser: `http://192.168.1.2`. It should show the default page "Welcome to nginx!".
 
 ### Principles of nginx configuration
-Read the [Beginner’s Guide](https://nginx.org/en/docs/beginners_guide.html "Beginner’s Guide"), which gives an idia of the block structure used in the configuration. You can have several server blocks, each defining a different port or server name. The server blocks itself may contain any number of location blocks, which define the action needed to handle the request at that specific location. An action can be a forwarding to another server or to a service. This is reverse proxying, which we will use for seafile and seahub daemons. Another action is simply delivering a static object. We will use this for delivering icons, avatars, JavaScript and the like.
+Read the [Beginner’s Guide](https://nginx.org/en/docs/beginners_guide.html "Beginner’s Guide"), which gives an idia of the block structure used in the configuration. 
+You can have several server blocks, each defining a different port or server name. The server blocks itself may contain any number of location blocks, which define 
+the action needed to handle the request at that specific location. An action can be a forwarding to another server or to a service. This is reverse proxying, which 
+we will use for seafile and seahub daemons. Another action is simply delivering a static object. We will use this for delivering icons, avatars, JavaScript and the like.
 ### Configuring the server for using Nginx
-One of the downsides of our configuration is not having configured our DNS properly. We gave our server a name, but it is not reachable via network using that name. So we are not able to access it like `http://cloudserver`.
+One of the downsides of our configuration is not having configured our DNS properly. We gave our server a name, but it is not reachable via network using that name. 
+So we are not able to access it like `http://cloudserver`.
 
-Nginx comes with a default configuration, defining a server listening on port 80 (default for http) named '\_', which is a catch-all that is taken if no other name/port combination matches. We don't want to switch that off, so we need an acceptable server name because we do not want to use a different port. We will use our IP address for now as the name of our virtual Nginx server.
+Nginx comes with a default configuration, defining a server listening on port 80 (default for http) named '\_', which is a catch-all that is taken if no other 
+name/port combination matches. We don't want to switch that off, so we need an acceptable server name because we do not want to use a different port. 
+We will use our IP address for now as the name of our virtual Nginx server.
 
 ### Create a basic Nginx configuration for Seafile Server
 Create a file `/etc/nginx/sites-available/seafile` with the following contents (adjust the IP adress in 'server_name'):
@@ -27,23 +45,20 @@ server {
     server_tokens off;
 
     location /seafile {
-        fastcgi_pass    127.0.0.1:8000;
-        fastcgi_param   SCRIPT_FILENAME     $document_root$fastcgi_script_name;
-        fastcgi_param   PATH_INFO           $fastcgi_script_name;
+        proxy_pass         http://127.0.0.1:8000;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Host $server_name;
+        proxy_set_header   X-Forwarded-Proto https;
+        proxy_http_version 1.1;
+        proxy_connect_timeout  36000s;
+        proxy_read_timeout  36000s;
+        proxy_send_timeout  36000s;
+        send_timeout  36000s;
 
-        fastcgi_param   SERVER_PROTOCOL     $server_protocol;
-        fastcgi_param   QUERY_STRING        $query_string;
-        fastcgi_param   REQUEST_METHOD      $request_method;
-        fastcgi_param   CONTENT_TYPE        $content_type;
-        fastcgi_param   CONTENT_LENGTH      $content_length;
-        fastcgi_param   SERVER_ADDR         $server_addr;
-        fastcgi_param   SERVER_PORT         $server_port;
-        fastcgi_param   SERVER_NAME         $server_name;
-        fastcgi_param   REMOTE_ADDR         $remote_addr;
-        fastcgi_param   HTTPS               off;
-        fastcgi_param   HTTP_SCHEME         http;
-
-        fastcgi_read_timeout                36000;
+        # used for view/edit office file via Office Online Server
+        client_max_body_size 0;
 
         access_log      /var/log/nginx/seahub.access.log;
         error_log       /var/log/nginx/seahub.error.log;
@@ -52,12 +67,13 @@ server {
     location /seafhttp {
         rewrite ^/seafhttp(.*)$ $1 break;
         proxy_pass http://127.0.0.1:8082;
-        client_max_body_size                0;
-        proxy_connect_timeout               36000s;
-        proxy_read_timeout                  36000s;
-        proxy_send_timeout                  36000s;
-        send_timeout                        36000s;
-        proxy_request_buffering             off;
+        client_max_body_size 0;
+        proxy_connect_timeout  36000s;
+        proxy_read_timeout  36000s;
+        proxy_send_timeout  36000s;
+        send_timeout  36000s;
+        proxy_request_buffering off;
+        proxy_http_version 1.1;
     }
 
     location /seafmedia {
@@ -66,23 +82,21 @@ server {
     }
 
     location /seafdav {
-        fastcgi_pass    127.0.0.1:8080;
-        fastcgi_param   SCRIPT_FILENAME     $document_root$fastcgi_script_name;
-        fastcgi_param   PATH_INFO           $fastcgi_script_name;
+        proxy_pass         http://127.0.0.1:8080;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Host $server_name;
+        proxy_set_header   X-Forwarded-Proto https;
+        proxy_http_version 1.1;
+        proxy_connect_timeout  36000s;
+        proxy_read_timeout  36000s;
+        proxy_send_timeout  36000s;
+        send_timeout  36000s;
 
-        fastcgi_param   SERVER_PROTOCOL     $server_protocol;
-        fastcgi_param   QUERY_STRING        $query_string;
-        fastcgi_param   REQUEST_METHOD      $request_method;
-        fastcgi_param   CONTENT_TYPE        $content_type;
-        fastcgi_param   CONTENT_LENGTH      $content_length;
-        fastcgi_param   SERVER_ADDR         $server_addr;
-        fastcgi_param   SERVER_PORT         $server_port;
-        fastcgi_param   SERVER_NAME         $server_name;
-
-        fastcgi_param   HTTPS               off;
-        proxy_request_buffering             off;
-
+        # This option is only available for Nginx >= 1.8.0. See more details below.
         client_max_body_size 0;
+        proxy_request_buffering off;
 
         access_log      /var/log/nginx/seafdav.access.log;
         error_log       /var/log/nginx/seafdav.error.log;
@@ -141,10 +155,11 @@ DATABASES = ...
 
 Adjust `ExecStart` in `/etc/systemd/system/seahub.service` to tell seahub it is used in conjunction with Nginx:
 ```
-ExecStart=/opt/Seafile/Server/seafile-server-latest/seahub.sh start-fastcgi
+ExecStart=/opt/seafile/seafile-server-latest/seahub.sh start-fastcgi
 ```
 
-At least a little security enhancement. We will bind seafile service to localhost only which makes it reachable through Nginx only. Add a line in `/opt/Seafile/Server/conf/seafile.conf` between `[fileserver]` and `port = 8082` like:
+At least a little security enhancement. We will bind seafile service to localhost only which makes it reachable through Nginx only. Add a line 
+in `/opt/seafile/conf/seafile.conf` between `[fileserver]` and `port = 8082` like:
 ```
 [fileserver]
 host = 127.0.0.1
@@ -166,7 +181,9 @@ If everything looks fine, it is time for a backup of the installation!
 
 
 ### Troubleshooting
-If you get an error when starting a service it is a good hint in which parts of the configuration the problem has its cause. We modified ccnet.conf which affects seafile and seahub. seafile.conf affects seafile. seahub.service and seahub_settings.py affect seahub. The Nginx configuration affects only Nginx!
+If you get an error when starting a service it is a good hint in which parts of the configuration the problem has its cause. 
+We modified ccnet.conf which affects seafile and seahub. seafile.conf affects seafile. seahub.service and seahub_settings.py affect seahub. 
+The Nginx configuration affects only Nginx!
 
 Check the ports. They need to be open for localhost.
 - 22: openssh (only open if installed)
@@ -175,7 +192,7 @@ Check the ports. They need to be open for localhost.
 - 8000: seahub
 - 8082: seafile
 
-With the exeption of port 22 the only port open from LAN should be port 80.
+With the exeption of port `22` the only port open from LAN should be port `80`.
 ```sh
 root@cloudserver:~# nmap localhost
 
@@ -243,16 +260,19 @@ ETag: "593f7cf8-3144"
 Accept-Ranges: bytes
 ```
 
-If you get 'HTTP/1.1 404 Not Found', did you adjust the IP address in `/etc/nginx/sites-available/seafile`? Have you set the link in `/etc/nginx/sites-enabled/` to enable it? 'Server: nginx/1.10.3' is an indication, that the 'default server' is taken, not the 'seafile server'. And yes, we should turn that off, but at this point it's helpful. 'Server: nginx': Paths in `location /seafmedia` in `/etc/nginx/sites-available/seafile` and the Seafile Server installation do not match. Is the file present:
+If you get 'HTTP/1.1 404 Not Found', did you adjust the IP address in `/etc/nginx/sites-available/seafile`? Have you set the link in `/etc/nginx/sites-enabled/` to enable it? 
+'Server: nginx/1.10.3' is an indication, that the 'default server' is taken, not the 'seafile server'. And yes, we should turn that off, but at this point it's helpful. 
+'Server: nginx': Paths in `location /seafmedia` in `/etc/nginx/sites-available/seafile` and the Seafile Server installation do not match. Is the file present:
 ```sh
-root@cloudserver:~# ls -l /opt/Seafile/Server/seafile-server-latest/seahub/media/img/seafile-logo.png
--rw-rw-r-- 1 seafserver seafserver 12612 Jun 13 07:49 /opt/Seafile/Server/seafile-server-latest/seahub/media/img/seafile-logo.png
+root@cloudserver:~# ls -l /opt/seafile/seafile-server-latest/seahub/media/img/seafile-logo.png
+-rw-rw-r-- 1 seafserver seafserver 12612 Jun 13 07:49 /opt/seafile/seafile-server-latest/seahub/media/img/seafile-logo.png
 ```
 
 'HTTP/1.1 403 Forbidden': Check the filesystem access rights 
-for `/opt/Seafile/Server/seafile-server-latest/seahub/media/img/seafile-logo.png`. Each directory in the whole path must have set read and execute bit for others (drwxr-x**r**-**x**), the file itself must be world readable (-rwxr-x**r**--).
+for `/opt/seafile/seafile-server-latest/seahub/media/img/seafile-logo.png`. Each directory in the whole path must have set read and execute bit for others (drwxr-x**r**-**x**), 
+the file itself must be world readable (-rwxr-x**r**--).
 
-Avatar Icon damaged: check filesystem rights for `/srv/Seafile/seahub-data/avatars/default.png`. The whole path must be world readable.
+Avatar Icon damaged: check filesystem rights for `/srv/seafile/seahub-data/avatars/default.png`. The whole path must be world readable.
 
 Nginx and seahub daemon:
 ```sh
@@ -269,9 +289,11 @@ Content-Language: en
 
 If you dont get the 'HTTP/1.1 302 FOUND', there is a problem between seahub daemon and Nginx. Activated `start-fastcgi` in `seahub.service`?
 
-Still problems? Look into the log-files in `/var/log/nginx/`, `/opt/Seafile/Server/logs/` and `/var/log/messages`.
+Still problems? Look into the log-files in `/var/log/nginx/`, `/opt/seafile/logs/` and `/var/log/messages`.
 
 If you got it working, back up the installation.
+
+---
 
 ## Access from Internet
 
@@ -289,35 +311,57 @@ root@cloudserver:~# wget -qO- http://ipecho.net/plain; echo
 62.224.170.64
 ```
 
-Do a test from outside your LAN (smartphone with a mobile connection will be sufficiant) using a web browser: `http://62.224.170.64/seafile`. If you can see your Seafile Server, do not log in, it will break things! If it does not work, you are probably behind a Carrier-grade NAT, Dual Stack Lite or whatever prevents a connection from internet to your server. Sorry, but no IPv4 access to your Seafile Server.
+Do a test from outside your LAN (smartphone with a mobile connection will be sufficiant) using a web browser: `http://62.224.170.64/seafile`. If you can see 
+your Seafile Server, do not log in, it will break things! If it does not work, you are probably behind a Carrier-grade NAT, Dual Stack Lite or whatever prevents 
+a connection from internet to your server. Sorry, but no IPv4 access to your Seafile Server.
 
 ### IPv6 behind router in local LAN
 Enable IPv6 access from internet to your server for port 80 and port 443 in your router.
 
-Do a test from outside your LAN using a web browser:  `https://[2003:a:452:e300:5054:ff:feae:a412]/seafile`. A smartphone using a mobile connection will do, if it provides IPv6 internet access. Be sure to have IPv6 internet access. You can test it using a service like `http://test-ipv6.com/`.
+Do a test from outside your LAN using a web browser:  `https://[2003:a:452:e300:5054:ff:feae:a412]/seafile`. A smartphone using a mobile connection will do, 
+if it provides IPv6 internet access. Be sure to have IPv6 internet access. You can test it using a service like `http://test-ipv6.com/`.
 
-If you can reach your Seafile Server, don't log in! If you cannot see your Seafile Server it is probably behind a firewall of your internet service provider. Sorry, but no IPv6 access to your Seafile Server.
+If you can reach your Seafile Server, don't log in! If you cannot see your Seafile Server it is probably behind a firewall of your internet service provider. 
+Sorry, but no IPv6 access to your Seafile Server.
 
-## Domain Name
+---
+
+## (sub)Domain Name
 A Domain Name is essential to use a trusted X.509 certificate. If you want the web browsers to accept your certificate, you need a domain name.
 ### Static or dynamic IP / prefix?
-If you don't know, if you have a static IP, you probably have a dynamic IP. That means your public IP changes from time to time. It may change after each login of your router to your internet service provider, daily, after some months or whenever. For IPv4 you normally get one IP for your router, which can forward requests to your LAN. For IPv6 you get a whole network, from which IPv6 addresses are distributed to the devices in your network. The common part of these addresses is called prefix.
+If you don't know, if you have a static IP, you probably have a dynamic IP. That means your public IP changes from time to time. It may change after 
+each login of your router to your internet service provider, daily, after some months or whenever. For IPv4 you normally get one IP for your router, 
+which can forward requests to your LAN. For IPv6 you get a whole network, from which IPv6 addresses are distributed to the devices in your network. 
+The common part of these addresses is called prefix.
 
 ### Static IP / prefix
-You can either register a domain like 'seafile.com' (that one is already assigned to sombody else, choose another one) and point it to your IPv4 and / or IPv6 address or create a subdomain in it like 'home.seafile.com' and do the same with the subdomain. Or you can ignore that it's static and do the same as it was a dynamic IP.
+You can either register a domain like 'seafile.com' (that one is already assigned to sombody else, choose another one) and point it to your IPv4 and / or 
+IPv6 address or create a subdomain in it like 'home.seafile.com' and do the same with the subdomain. Or you can ignore that it's static and do the same as 
+it was a dynamic IP.
 
 ### Dynamic IP / prefix
 If you have a dynamic IP, you need a [DDNS](https://en.wikipedia.org/wiki/Dynamic_DNS "DDNS") provider.
 
-You can register a domain and do what your provider recommends to update the IP address. If you choose one for free, you will get a name like 'subdomainspecialforyou.bigddnsprovider.tld'. There is nothing wrong with it, but if you want to register an X.509 certificate for it, make sure it will be possible with the certificate authority of your choice. Let's Encrypt for example has [Rate Limits](https://letsencrypt.org/docs/rate-limits/ "Rate Limits") which prevent users of 'bigddnsprovider.tld' to register too many certificates within a time interval. A hosting provider may request a higher rate limit for Let's Encrypt, but if your favorite provider didn't do that, you will run into problems getting or renewing a certificate. Check that before you choose a DDNS provider and want to use Let's Encrypt. This is no problem if you register your own domain.
+You can register a domain and do what your provider recommends to update the IP address. If you choose one for free, you will get a name like 'subdomainspecialforyou.bigddnsprovider.tld'. 
+There is nothing wrong with it, but if you want to register an X.509 certificate for it, make sure it will be possible with the certificate authority of your choice. Let's Encrypt for 
+example has [Rate Limits](https://letsencrypt.org/docs/rate-limits/ "Rate Limits") which prevent users of 'bigddnsprovider.tld' to register too many certificates within a time interval.
+A hosting provider may request a higher rate limit for Let's Encrypt, but if your favorite provider didn't do that, you will run into problems getting or renewing a certificate. 
+Check that before you choose a DDNS provider and want to use Let's Encrypt. This is no problem if you register your own domain.
+
 ### Dynamic IPv4
-Because all devices in LAN share the public IPv4 address, each of the devices may do the update of the DDNS name. Let the router it, if is able to. That's normally the most stable solution. Your server should be the next choice.
+Because all devices in LAN share the public IPv4 address, each of the devices may do the update of the DDNS name. Let the router it, if is able to. 
+That's normally the most stable solution. Your server should be the next choice.
+
 ### Dynamic IPv6
 Because each device gets its own IPv6 address, it is up to your server to do the update.
+
 ### Implement DDNS update, configure DNS
-If it's static DNS, configure it to point to your IP address(es). DDNS users should test the update mechanism to make sure, it allways points to your current IP address(es). Switch your router off and on and whatever you can think of to ensure, it's working.
+If it's static DNS, configure it to point to your IP address(es). DDNS users should test the update mechanism to make sure, it allways points to your 
+current IP address(es). Switch your router off and on and whatever you can think of to ensure, it's working.
+
 ### Configure Seafile Server for your domain
-If you don't have a public IPv4 address, don't configure an IPv4 address for your domain! If you don't have a public IPv6 address, don't configure an IPv6 address for your domain! You may configure your public IPv4 address and your global IPv6 address of your server, if you can reach your server with both protocols.
+If you don't have a public IPv4 address, don't configure an IPv4 address for your domain! If you don't have a public IPv6 address, don't configure an 
+IPv6 address for your domain! You may configure your public IPv4 address and your global IPv6 address of your server, if you can reach your server with both protocols.
 
 Configure `/etc/nginx/sites-available/seafile` to be web server for your domain. IPv6 users may also enable port 80 for IPv6. Adjust the server name to your needs:
 ```
@@ -358,21 +402,41 @@ root@cloudserver:~# systemctl start seahub
 root@cloudserver:~# systemctl restart nginx
 ```
 
-Test it with your web browser: `http://home.seafile.com/seafile`. If it does not work, try from outside your LAN. If that works, but from inside your LAN it does not, it's probably a problem with [hairpinning](https://en.wikipedia.org/wiki/Hairpinning "hairpinning") (also known as NAT loopback). In most cases, the router simply does not support it. You could try [split DNS](https://en.wikipedia.org/wiki/Split-horizon_DNS "split DNS"), but that's evil and I didn't tell you. Better try a different router.
+Test it with your web browser: `http://home.seafile.com/seafile`. If it does not work, try from outside your LAN. If that works, but from inside your LAN it does not, 
+it's probably a problem with [hairpinning](https://en.wikipedia.org/wiki/Hairpinning "hairpinning") (also known as NAT loopback). In most cases, the router simply does 
+not support it. You could try [split DNS](https://en.wikipedia.org/wiki/Split-horizon_DNS "split DNS"), but that's evil and I didn't tell you. Better try a different router.
+
+---
+
 ### Troubleshooting
 If you can log into your Seafile Server but uploading or viewing files failes, check your `SERVICE_URL` and `FILE_SERVER_ROOT` in seafile settings again.
 
 Do not forget your backups!
 
+---
+
 ## Seafile Server with Nginx HTTPS
+
+**INFO**  
+If you want a validated certificate from Let's Encrypt, you may set LE up later.  
+Please do **not skip** the following steps as they are important for the setup to be complete.
+
+
 First of all, switch off gzip compression if using https. It's a security risk:
 ```sh
 root@cloudserver:~# sed -i 's/\tgzip/\t# gzip/' /etc/nginx/nginx.conf
 ```
 
-For TLS (HTTPS) we need a [digital certificate](https://en.wikipedia.org/wiki/Public_key_certificate "digital certificate"), which proves the ownership of a [public key](https://en.wikipedia.org/wiki/Public_key "public key"). That means, we need to create a pair of keys (public and private part), and then sign them by ourselves. We can use this self-signed certificate for TLS, but it will not be accepted by the browsers. Must browsers allow to enter an exeption for our server so we can live with it for the moment.
+For TLS (HTTPS) we need a [digital certificate](https://en.wikipedia.org/wiki/Public_key_certificate "digital certificate"), which proves the ownership of 
+a [public key](https://en.wikipedia.org/wiki/Public_key "public key"). That means, we need to create a pair of keys (public and private part), and then 
+sign them by ourselves. We can use this self-signed certificate for TLS, but it will not be accepted by the browsers. Must browsers allow to enter an exeption 
+for our server so we can live with it for the moment.
 
-Modern cryptography offers [forward secrecy](https://en.wikipedia.org/wiki/Forward_secrecy "forward secrecy"), a protection against future compromises, which requires [Diffie–Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange "Diffie–Hellman key exchange"). We need to generate the parameters for it. The Certificate Signing Request will ask you some things required for the certificate. Just fill in what you think it's right. It will be visible in the certificate.
+Modern cryptography offers [forward secrecy](https://en.wikipedia.org/wiki/Forward_secrecy "forward secrecy"), a protection against future compromises, 
+which requires [Diffie–Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange "Diffie–Hellman key exchange"). We need to 
+generate the parameters for it. The Certificate Signing Request will ask you some things required for the certificate. Just fill in what you think it's right. 
+It will be visible in the certificate.
+
 ```sh
 root@cloudserver:~# cd /etc/ssl/private
 root@cloudserver:/etc/ssl/private# openssl genrsa -out privkey.pem 2048

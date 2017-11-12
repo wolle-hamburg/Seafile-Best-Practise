@@ -2,9 +2,15 @@
 
 ---
 
+# Tasks
+* Install Seafile Server
+* Enable Seafile Server autostart
+
+---
 
 ## Install Seafile Server
 We will install Seafile Server in `/opt/Seafile/Server`, Seafile data in `/srv/Seafile/seafile_data`.
+
 ### Prerequisites
 Install required packages for Seafile Server:
 ```sh
@@ -53,19 +59,19 @@ root@cloudserver:~# mkdir /srv/Seafile
 root@cloudserver:~# /opt/Seafile/Server/seafile-server-*/setup-seafile-mysql.sh
 ```
 
-- [ server name ] Cloud (whatever you like)
-- [ This server's ip or domain ] 192.168.1.2 (Server's IP address)
-- [ default "/opt/Seafile/Server/seafile-data" ] /srv/Seafile/seafile-data
-- [ default "8082" ] (leave the port as it is)
-- [ 1 or 2 ] 1 (create new databases)
-- [ default "localhost" ] (database runs on this server)
-- [ default "3306" ] (standard port for mysql or mariadb)
-- [ root password ] <enter root password>
-- [ default "seafile" ] (it's the name of the user in mariadb)
-- [ password for seafile ] (give the user a password, no need to remember)
-- [ default "ccnet-db" ]
-- [ default "seafile-db" ]
-- [ default "seahub-db" ]
+- `[ server name ]` Cloud (whatever you like)
+- `[ This server's ip or domain ]` 192.168.1.2 (Server's IP address)
+- `[ default "/opt/Seafile/Server/seafile-data" ]` /srv/Seafile/seafile-data
+- `[ default "8082" ]` (leave the port as it is)
+- `[ 1 or 2 ]` 1 (create new databases)
+- `[ default "localhost" ]` (database runs on this server)
+- `[ default "3306" ]` (standard port for mysql or mariadb)
+- `[ root password ]` <enter root password>
+- `[ default "seafile" ]` (it's the name of the user in mariadb)
+- `[ password for seafile ]` (give the user a password, no need to remember)
+- `[ default "ccnet-db" ]`
+- `[ default "seafile-db" ]`
+- `[ default "seahub-db" ]`
 
 Now the user seafserver needs to own the whole stuff:
 ```sh
@@ -98,8 +104,11 @@ $ seafile-server-latest/seahub.sh start
 - [ admin password ] (give it a password)
 - [ admin password again ] (password again)
 
-### Verification
-Use nmap to check the necessary ports are open. 22 is SSH, only open if you installed SSH server.  3306 is mariadb, only bound to localhost, not accessible from outside via network. 8000 is seahub, the web interface. 8082 is seafile, the data service daemon:
+--- 
+
+## Verification
+Use nmap to check the necessary ports are open. 22 is SSH, only open if you installed SSH server.  3306 is mariadb, only bound to localhost, 
+not accessible from outside via network. 8000 is seahub, the web interface. 8082 is seafile, the data service daemon:
 ```sh
 $ nmap localhost
 
@@ -148,8 +157,12 @@ root@cloudserver:~# ln -s /opt/Seafile/Server/seahub-data /srv/Seafile/seahub-da
 
 At least start your Seafile Server again as user 'seafserver' to check it's still working. Stop Seafile Server before proceeding to the next step.
 
-## Systemd service files
-For a convenient start of Seafile Server we need some appropriate definition files for the operating system. Debian 9 uses systemd as init system, so we create service files for systemd. Create a file ` /etc/systemd/system/seafile.service` with the following contents:
+--- 
+
+## Enable Seafile Server autostart (systemd)
+
+For a convenient start of Seafile Server we need some appropriate definition files for the operating system. Debian 9/Ubuntu/CentOS use systemd as 
+init system, so we create service files for systemd. Create a file ` /etc/systemd/system/seafile.service` with the following contents:
 ```
 [Unit]
 Description=Seafile

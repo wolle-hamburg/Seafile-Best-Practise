@@ -46,4 +46,4 @@ markdown_extensions:
         permalink:
     - admonition:
 
-copyright: Copyright &copy; 2017 <a href="https://forum.seafile.com">DerDanilo, Wolle - Seafile Community</a>, <a href="/general/contribution">Contribution</a>.
+copyright: Copyright &copy; 2017 <a href="https://forum.seafile.com">DerDanilo, Wolle - Seafile Community</a>, <a href="/#contribution">Contribution</a>.

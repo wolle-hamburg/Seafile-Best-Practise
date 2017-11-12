@@ -4,7 +4,9 @@
 
 # Tasks
 * Configure static IP(s)
+* Install diagnostic tools
 * Verify network config
+
 
 # Server IP already assigned
 If you have a *root server* or *vServer* or for whatever reason you got a static IPv4 address for your server, just use that address and your are done with this chapter. 
@@ -154,13 +156,10 @@ now and point it to your IPv6 address.
 
 ---
 
-# Verify network config
-## Install diagnostic tools
+# Install diagnostic tools
 
 * `curl` is a tool to transfer data from or to a server. We will use it to diagnose the web server.
 * `nmap` is a network exploration tool. We will use it as a port scanner to diagnose running services.
-
-Install curl & nmap
 
 **Debian / Ubuntu / Rasphian**
 ```bash
@@ -173,6 +172,8 @@ root@cloudserver:~# yum install curl nmap
 ```
 
 ---
+
+## Verify network config
 
 ### IPv4
 *To be written...*

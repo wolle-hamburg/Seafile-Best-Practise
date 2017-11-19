@@ -1,6 +1,6 @@
 # OnlyOffice integration
 
-TOC
+[TOC]
 
 ---
 
@@ -19,12 +19,12 @@ Benefits:
 - easy and quick deployment
 - easy management
 
-## Official reverse proxy configuration
+## Official webserver config examples
 [Here](https://github.com/ONLYOFFICE/document-server-proxy) you can find the original webserver config examples.
 
 ---
 
-## Deployment of DocumentServer via SUBDOMAIN
+## Deployment via SUBDOMAIN
 URL example: https://onlyoffice.domain.com
 
 - Subdomain
@@ -61,7 +61,7 @@ When you click on a document you should see the new preview page.
 
 
 
-## Deployment of DocumentServer via SUBFOLDER
+## Deployment via SUBFOLDER
 URL example: https://seafile.domain.com/onlyofficeds
 
 - Local proxy to subfolder on already existing Seafile Server (sub)domain.

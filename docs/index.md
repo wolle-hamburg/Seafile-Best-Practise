@@ -11,7 +11,7 @@
 We write this step-by-step guide to enable all users to setup Seafile on their own, without the struggle 
 of having to read the more complex and sometimes confusing [original manual](https://manual.seafile.com/).
 
-Our intension is not to replace the [original manual](https://manual.seafile.com/) !
+It is not our intension to replace the [original manual](https://manual.seafile.com/) !
 
 **How does it work?**
 

@@ -1,4 +1,4 @@
-
+# Seafile Server Community Manual
 
 [TOC]
 
@@ -11,12 +11,14 @@
 We write this step-by-step guide to enable all users to setup Seafile on their own, without the struggle 
 of having to read the more complex and sometimes confusing [original manual](https://manual.seafile.com/).
 
+Our intension is not to replace the [original manual](https://manual.seafile.com/) !
+
 **How does it work?**
 
 This manual will guide you through each step of the setup. If you are new to Seafile we encourage
 you to to the checks whereever we recommend them. This helps to pinpoint possible errors before you have to search for them.
 
-This manual will show how to setup a Seafile Server using MariaDB, Memcached and Nginx as a reverse proxy.
+This manual will show how to setup a Seafile Server using MariaDB, Memcached and Nginx as a local reverse proxy.
 
 All operations will be peformed as root unless otherwise specified. So login as root or 'su' to root, if logged in as ordinary user:
 ```bash
